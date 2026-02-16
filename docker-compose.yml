@@ -1,0 +1,54 @@
+# Custom network with name "mentees-net"
+networks:
+  mentees-net:
+    driver: bridge
+
+# Persistent volume
+volumes:
+  postgres_data:
+
+services:
+  # Database service
+  db:
+    image: postgres:13-alpine
+    container_name: parent_db
+    restart: unless-stopped
+    networks:
+      - mentees-net
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+
+  # Backend API service - using port 3100 (within 3100-3111 range)
+  backend:
+    build: ./backend
+    container_name: parent_backend
+    restart: unless-stopped
+    networks:
+      - mentees-net
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    ports:
+      - "3100:3100"  # Using port 3100 as requested
+
+  # Frontend service
+  frontend:
+    build: ./frontend
+    container_name: parent_frontend
+    restart: unless-stopped
+    networks:
+      - mentees-net
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
