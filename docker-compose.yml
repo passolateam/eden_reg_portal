@@ -1,53 +1,47 @@
 
-networks:
-  mentees-net:
-    driver: bridge
-
-volumes:
-  postgres_data:
-
 services:
 
   db:
     image: postgres:13-alpine
-    container_name: parent_db
-    restart: unless-stopped
-    networks:
-      - mentees-net
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    restart: always
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "3101:3101"
-
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
   backend:
     build: ./backend
-    container_name: parent_backend
-    restart: unless-stopped
-    networks:
-      - mentees-net
-    depends_on:
-      - db
+    restart: always
+    ports:
+      - "3100:3100"
     environment:
       DB_HOST: db
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-    ports:
-      - "3100:3100"
-
+    depends_on:
+      - db
+    networks:
+      - app-network
 
   frontend:
     build: ./frontend
-    container_name: parent_frontend
-    restart: unless-stopped
-    networks:
-      - mentees-net
-    depends_on:
-      - backend
+    restart: always
     ports:
       - "3103:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+# 🔥 THIS PART IS REQUIRED
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
