@@ -1,7 +1,7 @@
 const form = document.getElementById("registrationForm");
 const responseDiv = document.getElementById("response");
 
-const API_URL = 'http://localhost:3100';
+const API_URL = "http://67.167.244.232:3100";
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -12,10 +12,10 @@ form.addEventListener("submit", async (e) => {
   const formData = new FormData(form);
 
   const data = {
-    parent_name: formData.get('parent_name'),
-    address: formData.get('address'),
-    phone: formData.get('phone'),
-    child_name: formData.get('child_name')
+    parent_name: formData.get("parent_name"),
+    address: formData.get("address"),
+    phone: formData.get("phone"),
+    child_name: formData.get("child_name"),
   };
 
   try {
@@ -35,7 +35,6 @@ form.addEventListener("submit", async (e) => {
       responseDiv.textContent = "Registration failed";
       responseDiv.style.color = "red";
     }
-
   } catch (err) {
     responseDiv.textContent = "Cannot connect to server";
     responseDiv.style.color = "red";

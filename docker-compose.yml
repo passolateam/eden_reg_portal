@@ -1,9 +1,9 @@
-
 services:
 
   db:
     image: postgres:13-alpine
     restart: always
+    container_name: db
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -30,6 +30,8 @@ services:
 
   frontend:
     build: ./frontend
+    environment:
+      - REACT_APP_API_URL=http://67.167.244.232:3100
     restart: always
     ports:
       - "3103:80"
@@ -38,10 +40,10 @@ services:
     networks:
       - app-network
 
-# 🔥 THIS PART IS REQUIRED
 volumes:
   postgres_data:
 
 networks:
   app-network:
     driver: bridge
+
